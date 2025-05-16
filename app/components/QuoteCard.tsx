@@ -56,7 +56,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
   <div className="flex flex-col items-center flex-1">
     <div
       ref={cardRef}
-      className="sticky top-8 relative w-[540px] h-[540px] rounded-2xl shadow-2xl flex flex-col justify-center items-center p-8 bg-white"
+      className="sticky top-8 relative w-[540px] h-[540px] rounded-2xl shadow-2xl flex flex-col justify-center items-center p-8"
       style={cardBg}
     >
       {/* Guillemets décoratifs */}
@@ -109,7 +109,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
     {/* Bouton de téléchargement */}
     <button
       onClick={handleDownload}
-      className="mt-5 mb-3 px-8 py-3 bg-primary text-white rounded-[15px] shadow-sm fw-bold fs-5 transition-all duration-200 hover:bg-blue-700 hover:scale-105 hover:shadow-lg"
+      className="btn btn-primary btn-lg mt-5 mb-3 px-8 py-3 bg-primary text-white rounded-[15px] shadow-sm fw-bold fs-5 transition-all duration-200 hover:bg-blue-700 hover:scale-105 hover:shadow-lg"
     >
       Télécharger l'image
     </button>
