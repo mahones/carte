@@ -1,5 +1,5 @@
 import React from "react";
-import { isColorSupportedByHtml2Canvas, convertToSupportedColor } from '../utils/colorUtils';
+import { isColorSupportedByHtml2Canvas, convertToSupportedColor, prepareBackgroundForDownload } from '../utils/colorUtils';
 import html2canvas from 'html2canvas';
 
 interface QuoteCardProps {
@@ -61,15 +61,12 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
     try {
       // Vérifier et convertir les couleurs non supportées
       const cardElement = cardRef.current;
-      const computedStyle = window.getComputedStyle(cardElement);
       
-      // Vérifier le background
-      const bgColor = computedStyle.background;
-      if (!isColorSupportedByHtml2Canvas(bgColor)) {
-        (cardElement as HTMLElement).style.background = convertToSupportedColor(bgColor);
-      }
+      // Préparer le fond (image ou dégradé)
+      prepareBackgroundForDownload(cardElement);
 
       // Vérifier la couleur du texte
+      const computedStyle = window.getComputedStyle(cardElement);
       const textColor = computedStyle.color;
       if (!isColorSupportedByHtml2Canvas(textColor)) {
         (cardElement as HTMLElement).style.color = convertToSupportedColor(textColor);

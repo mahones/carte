@@ -41,4 +41,47 @@ export function convertToSupportedColor(color: string): string {
 // Vérifie si un dégradé est valide
 export function isValidGradient(gradient: string): boolean {
   return /^linear-gradient\(\s*\d+deg\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*\)$/i.test(gradient);
+}
+
+// Prépare le style de fond pour le téléchargement
+export function prepareBackgroundForDownload(element: HTMLElement): void {
+  const computedStyle = window.getComputedStyle(element);
+  const backgroundImage = computedStyle.backgroundImage;
+  const background = computedStyle.background;
+
+  // Si c'est une image de fond
+  if (backgroundImage && backgroundImage !== 'none') {
+    // Garde uniquement l'image de fond avec ses propriétés
+    element.style.background = 'none';
+    element.style.backgroundColor = 'transparent';
+    element.style.backgroundImage = backgroundImage;
+    element.style.backgroundSize = computedStyle.backgroundSize;
+    element.style.backgroundPosition = computedStyle.backgroundPosition;
+    element.style.backgroundRepeat = computedStyle.backgroundRepeat;
+  }
+  // Si c'est un dégradé
+  else if (background.includes('linear-gradient')) {
+    // Conserve le dégradé tel quel s'il est valide
+    if (isValidGradient(background)) {
+      element.style.background = background;
+    } else {
+      // Si le dégradé n'est pas valide, on le convertit
+      const gradientMatch = background.match(/linear-gradient\(([^)]+)\)/i);
+      if (gradientMatch) {
+        const parts = gradientMatch[1].split(',');
+        const angle = parts[0].trim();
+        const colors = parts.slice(1).map(color => {
+          if (color.includes('oklab')) {
+            return convertToSupportedColor(color.trim());
+          }
+          return color.trim();
+        });
+        element.style.background = `linear-gradient(${angle}, ${colors.join(', ')})`;
+      }
+    }
+  }
+  // Si c'est une couleur simple
+  else {
+    element.style.background = convertToSupportedColor(background);
+  }
 } 
