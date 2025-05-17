@@ -1,33 +1,44 @@
 // Vérifie si une couleur ou un dégradé CSS est supporté par html2canvas
 export function isColorSupportedByHtml2Canvas(css: string): boolean {
-  // html2canvas ne supporte pas oklab, lch, lab, etc.
- if (/oklab|lch|lab/i.test(css)) return false;
-  // On accepte hex, rgb, rgba, hsl, linear-gradient classique
-  if (
-    /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(css) ||
-    /^rgb(a)?\(/i.test(css) ||
-    /^hsl(a)?\(/i.test(css) ||
-    /^linear-gradient\(/i.test(css)
-  ) {
-    return true;
+  // Si c'est une URL d'image, on accepte
+  if (css.startsWith('url(')) return true;
+
+  // Vérification des couleurs non supportées
+  if (/(oklab|lab|lch|color-mix|color-contrast|color-mix)/i.test(css)) {
+    return false;
   }
-  // Par défaut, on refuse
-  return false; 
- 
- /* const validLinearGradient = /^linear-gradient\(([^)]+)\)$/i;
-  const validColorFormats = /^(#([0-9a-f]{3}){1,2}|rgb\(([^)]+)\)|rgba\(([^)]+)\)|hsl\(([^)]+)\))$/i;
 
-  if (validColorFormats.test(css)) return true;
-  if (validLinearGradient.test(css)) return true;
+  // Validation des formats de couleur supportés
+  const validFormats = {
+    hex: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i,
+    rgb: /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/i,
+    rgba: /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)$/i,
+    hsl: /^hsl\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*\)$/i,
+    hsla: /^hsla\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*,\s*(0|1|0?\.\d+)\s*\)$/i,
+    linearGradient: /^linear-gradient\(\s*\d+deg\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*\)$/i
+  };
 
-  return false; 
+  // Vérifie si la couleur correspond à l'un des formats supportés
+  return Object.values(validFormats).some(format => format.test(css));
+}
 
-  const isHex = /^#(?:[0-9a-fA-F]{3}){1,2}$/i;
-  const isRGB = /^rgb\((\s*\d+\s*,){2}\s*\d+\s*\)$/i;
-  const isRGBA = /^rgba\((\s*\d+\s*,){3}\s*(0|1|0?\.\d+)\s*\)$/i;
-  const isHSL = /^hsl\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*\)$/i;
-  const isGradient = /^linear-gradient\(.+\)$/i;
+// Convertit une couleur non supportée en une couleur supportée
+export function convertToSupportedColor(color: string): string {
+  // Si la couleur est déjà supportée, la retourne telle quelle
+  if (isColorSupportedByHtml2Canvas(color)) {
+    return color;
+  }
 
-  return isHex.test(css) || isRGB.test(css) || isRGBA.test(css) || isHSL.test(css) || isGradient.test(css);
-  */
+  // Si c'est une URL d'image, la retourne telle quelle
+  if (color.startsWith('url(')) {
+    return color;
+  }
+
+  // Par défaut, retourne une couleur de secours
+  return '#1e3a8a';
+}
+
+// Vérifie si un dégradé est valide
+export function isValidGradient(gradient: string): boolean {
+  return /^linear-gradient\(\s*\d+deg\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*\)$/i.test(gradient);
 } 
