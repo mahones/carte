@@ -12,28 +12,51 @@ interface GradientPickerProps {
 }
 
 const GradientPicker: React.FC<GradientPickerProps> = ({ color1, setColor1, color2, setColor2, angle, setAngle, onGradientChange }) => {
-  React.useEffect(() => {
-    const gradient = `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`;
+  const updateGradient = (newColor1: string, newColor2: string, newAngle: number) => {
+    const gradient = `linear-gradient(${newAngle}deg, ${newColor1} 0%, ${newColor2} 100%)`;
     if (isValidGradient(gradient)) {
       onGradientChange(gradient);
     }
-  }, [color1, color2, angle, onGradientChange]);
+  };
+
+  const handleColor1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    setColor1(newColor);
+    updateGradient(newColor, color2, angle);
+  };
+
+  const handleColor2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    setColor2(newColor);
+    updateGradient(color1, newColor, angle);
+  };
+
+  const handleAngleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAngle = Number(e.target.value);
+    setAngle(newAngle);
+    updateGradient(color1, color2, newAngle);
+  };
+
+  // Mettre à jour le dégradé initial
+  React.useEffect(() => {
+    updateGradient(color1, color2, angle);
+  }, []);
 
   return (
     <div>
       <div className="mb-2">
         <label className="form-label">Couleur de début</label>
-        <input type="color" value={color1} onChange={e => setColor1(e.target.value)} className="form-control form-control-color w-25" />
+        <input type="color" value={color1} onChange={handleColor1Change} className="form-control form-control-color w-25" />
       </div>
       <div className="mb-2">
         <label className="form-label">Couleur de fin</label>
-        <input type="color" value={color2} onChange={e => setColor2(e.target.value)} className="form-control form-control-color w-25" />
+        <input type="color" value={color2} onChange={handleColor2Change} className="form-control form-control-color w-25" />
       </div>
       <div className="mb-2">
         <label className="form-label">Angle du dégradé ({angle}°)</label>
-        <input type="range" min="0" max="360" value={angle} onChange={e => setAngle(Number(e.target.value))} className="form-range" />
+        <input type="range" min="0" max="360" value={angle} onChange={handleAngleChange} className="form-range" />
       </div>
-      <div className="h-8 w-full rounded mb-2" style={{ background: `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`, backgroundImage: `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)` }} />
+      <div className="h-8 w-full rounded mb-2" style={{ background: `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)` }} />
     </div>
   );
 };

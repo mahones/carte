@@ -212,11 +212,20 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
               {props.bgType === "gradient" && (
                 <GradientPicker
                   color1={props.gradientColor1}
-                  setColor1={props.setGradientColor1}
+                  setColor1={(color) => {
+                    props.setGradientColor1(color);
+                    props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${color} 0%, ${props.gradientColor2} 100%)`);
+                  }}
                   color2={props.gradientColor2}
-                  setColor2={props.setGradientColor2}
+                  setColor2={(color) => {
+                    props.setGradientColor2(color);
+                    props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${props.gradientColor1} 0%, ${color} 100%)`);
+                  }}
                   angle={props.gradientAngle}
-                  setAngle={props.setGradientAngle}
+                  setAngle={(angle) => {
+                    props.setGradientAngle(angle);
+                    props.setBgGradient(`linear-gradient(${angle}deg, ${props.gradientColor1} 0%, ${props.gradientColor2} 100%)`);
+                  }}
                   onGradientChange={props.setBgGradient}
                 />
               )}
