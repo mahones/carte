@@ -65,12 +65,8 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
       // Préparer le fond (image ou dégradé)
       prepareBackgroundForDownload(cardElement);
 
-      // Vérifier la couleur du texte principal
-      const computedStyle = window.getComputedStyle(cardElement);
-      const textColor = computedStyle.color;
-      if (!isColorSupportedByHtml2Canvas(textColor)) {
-        (cardElement as HTMLElement).style.color = convertToSupportedColor(textColor);
-      }
+      // S'assurer que les polices sont chargées avant la capture
+      await document.fonts.ready;
 
       // Générer l'image avec les options appropriées
       const canvas = await html2canvas(cardRef.current, {
@@ -80,7 +76,30 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
         backgroundColor: null,
         logging: false,
         removeContainer: true,
-        foreignObjectRendering: false
+        foreignObjectRendering: false,
+        onclone: (clonedDoc) => {
+          // Appliquer les styles au clone pour s'assurer qu'ils sont bien pris en compte
+          const clonedElement = clonedDoc.querySelector('[data-card]');
+          if (clonedElement) {
+            prepareBackgroundForDownload(clonedElement as HTMLElement);
+            
+            // Forcer le chargement des polices et appliquer les styles dans le clone
+            const textElements = clonedElement.querySelectorAll('*');
+            textElements.forEach(element => {
+              const computedStyle = window.getComputedStyle(element);
+              const fontFamily = computedStyle.fontFamily;
+              if (fontFamily && fontFamily !== 'inherit') {
+                (element as HTMLElement).style.fontFamily = fontFamily;
+              }
+              
+              // Appliquer les styles de texte
+              if (element.classList.contains('quote-text')) {
+                (element as HTMLElement).style.fontStyle = isItalic ? 'italic' : 'normal';
+                (element as HTMLElement).style.textDecoration = isUnderline ? 'underline' : 'none';
+              }
+            });
+          }
+        }
       });
 
       // Créer le lien de téléchargement
@@ -97,31 +116,45 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
     <div className="flex flex-col items-center flex-1">
       <div
         ref={cardRef}
+        data-card="true"
         className="sticky top-8 relative w-[540px] h-[540px] rounded-2xl shadow-2xl flex flex-col justify-center items-center p-8"
-        style={cardBg}
+        style={{
+          ...cardBg,
+          fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`
+        }}
       >
         {/* Guillemets décoratifs */}
-        <div className="absolute left-6 top-6 text-5xl text-white/80 select-none">"</div>
+        <div 
+          className="absolute left-6 top-6 text-5xl text-white/80 select-none" 
+          style={{ 
+            fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif` 
+          }}
+        >"</div>
         <div
           className="flex-1 flex flex-col justify-center w-full"
-          style={{
-            fontFamily,
-            color: fontColor,
-            fontWeight,
-            textAlign: align as any,
-            fontSize: `${fontSize}px`,
-            fontStyle: isItalic ? 'italic' : 'normal',
-            textDecoration: isUnderline ? 'underline' : 'none',
-            lineHeight: lineHeight,
-            letterSpacing: `${letterSpacing}px`
-          }}
         >
-          <span>{quote}</span>
+          <span
+            className="quote-text"
+            style={{
+              fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`,
+              color: fontColor,
+              fontWeight,
+              textAlign: align as any,
+              fontSize: `${fontSize}px`,
+              fontStyle: isItalic ? 'italic' : 'normal',
+              textDecoration: isUnderline ? 'underline' : 'none',
+              lineHeight: lineHeight,
+              letterSpacing: `${letterSpacing}px`
+            }}
+          >{quote}</span>
         </div>
         {/* Auteur toujours affiché */}
         <div
           className="flex items-center gap-3 mt-6 w-full"
-          style={{ justifyContent: authorAlign === 'left' ? 'flex-start' : authorAlign === 'center' ? 'center' : 'flex-end' }}
+          style={{ 
+            justifyContent: authorAlign === 'left' ? 'flex-start' : authorAlign === 'center' ? 'center' : 'flex-end',
+            fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`
+          }}
         >
           {profileImg && (
             <img
@@ -140,12 +173,29 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
             />
           )}
           <div className="flex flex-col">
-            <span className="font-semibold" style={{ fontFamily, color: authorColor }}>{author}</span>
-            <span className="text-xs opacity-80" style={{ fontFamily, color: subtitleColor }}>{subtitle}</span>
+            <span 
+              className="font-semibold" 
+              style={{ 
+                fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`, 
+                color: authorColor 
+              }}
+            >{author}</span>
+            <span 
+              className="text-xs opacity-80" 
+              style={{ 
+                fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`, 
+                color: subtitleColor 
+              }}
+            >{subtitle}</span>
           </div>
         </div>
         {/* Guillemets décoratifs bas */}
-        <div className="absolute right-6 bottom-6 text-5xl text-white/80 select-none">"</div>
+        <div 
+          className="absolute right-6 bottom-6 text-5xl text-white/80 select-none" 
+          style={{ 
+            fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif` 
+          }}
+        >"</div>
       </div>
       {/* Bouton de téléchargement */}
       <button

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Roboto, Arial, Georgia, Times_New_Roman, Montserrat, Lato, Oswald, Raleway, Merriweather, Playfair_Display, Poppins, Nunito, Quicksand, Ubuntu, Fira_Sans } from "next/font/google";
 import "./globals.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -11,6 +11,79 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Configuration des polices Google
+const roboto = Roboto({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-roboto',
+});
+
+const montserrat = Montserrat({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+});
+
+const lato = Lato({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-lato',
+});
+
+const oswald = Oswald({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-oswald',
+});
+
+const raleway = Raleway({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-raleway',
+});
+
+const merriweather = Merriweather({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-merriweather',
+});
+
+const playfair = Playfair_Display({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-playfair',
+});
+
+const poppins = Poppins({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-poppins',
+});
+
+const nunito = Nunito({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-nunito',
+});
+
+const quicksand = Quicksand({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-quicksand',
+});
+
+const ubuntu = Ubuntu({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-ubuntu',
+});
+
+const firaSans = Fira_Sans({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-fira-sans',
 });
 
 export const metadata: Metadata = {
@@ -26,7 +99,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`
+          ${geistSans.variable} 
+          ${geistMono.variable} 
+          ${roboto.variable}
+          ${montserrat.variable}
+          ${lato.variable}
+          ${oswald.variable}
+          ${raleway.variable}
+          ${merriweather.variable}
+          ${playfair.variable}
+          ${poppins.variable}
+          ${nunito.variable}
+          ${quicksand.variable}
+          ${ubuntu.variable}
+          ${firaSans.variable}
+          antialiased
+        `}
       >
         {children}
       </body>
