@@ -65,53 +65,31 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
       // Préparer le fond (image ou dégradé)
       prepareBackgroundForDownload(cardElement);
 
-      // Vérifier la couleur du texte
+      // Vérifier la couleur du texte principal
       const computedStyle = window.getComputedStyle(cardElement);
       const textColor = computedStyle.color;
       if (!isColorSupportedByHtml2Canvas(textColor)) {
         (cardElement as HTMLElement).style.color = convertToSupportedColor(textColor);
       }
 
-      // Vérifier les couleurs des éléments enfants
-      const elements = cardElement.getElementsByTagName('*');
-      for (const element of elements) {
-        const elementStyle = window.getComputedStyle(element);
-        const elementColor = elementStyle.color;
-        const elementBg = elementStyle.background;
-
-        if (!isColorSupportedByHtml2Canvas(elementColor)) {
-          (element as HTMLElement).style.color = convertToSupportedColor(elementColor);
-        }
-        if (!isColorSupportedByHtml2Canvas(elementBg)) {
-          (element as HTMLElement).style.background = convertToSupportedColor(elementBg);
-        }
-      }
-
-      // Générer l'image
+      // Générer l'image avec les options appropriées
       const canvas = await html2canvas(cardRef.current, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null
+        backgroundColor: null,
+        logging: false,
+        removeContainer: true,
+        foreignObjectRendering: false
       });
 
-      // Convertir en blob et télécharger
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = 'quote-card.png';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/png');
-
+      // Créer le lien de téléchargement
+      const link = document.createElement("a");
+      link.download = "quote-card.png";
+      link.href = canvas.toDataURL("image/png", 1.0);
+      link.click();
     } catch (error) {
-      console.error('Error generating image:', error);
-      alert('Une erreur est survenue lors de la génération de l\'image. Veuillez réessayer.');
+      console.error("Erreur lors du téléchargement:", error);
     }
   };
 

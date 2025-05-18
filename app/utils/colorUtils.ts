@@ -84,4 +84,17 @@ export function prepareBackgroundForDownload(element: HTMLElement): void {
   else {
     element.style.background = convertToSupportedColor(background);
   }
+
+  // Ne pas appliquer de fond aux éléments enfants
+  const children = element.getElementsByTagName('*');
+  for (const child of children) {
+    const childStyle = window.getComputedStyle(child);
+    // Ne conserver que la couleur du texte si nécessaire
+    if (!isColorSupportedByHtml2Canvas(childStyle.color)) {
+      (child as HTMLElement).style.color = convertToSupportedColor(childStyle.color);
+    }
+    // Supprimer tout fond des éléments enfants
+    (child as HTMLElement).style.background = 'transparent';
+    (child as HTMLElement).style.backgroundColor = 'transparent';
+  }
 } 

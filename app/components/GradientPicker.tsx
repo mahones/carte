@@ -1,4 +1,5 @@
 import React from "react";
+import { isValidGradient } from "../utils/colorUtils";
 
 interface GradientPickerProps {
   color1: string;
@@ -12,7 +13,10 @@ interface GradientPickerProps {
 
 const GradientPicker: React.FC<GradientPickerProps> = ({ color1, setColor1, color2, setColor2, angle, setAngle, onGradientChange }) => {
   React.useEffect(() => {
-    onGradientChange(`linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`);
+    const gradient = `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`;
+    if (isValidGradient(gradient)) {
+      onGradientChange(gradient);
+    }
   }, [color1, color2, angle, onGradientChange]);
 
   return (
@@ -29,7 +33,7 @@ const GradientPicker: React.FC<GradientPickerProps> = ({ color1, setColor1, colo
         <label className="form-label">Angle du dégradé ({angle}°)</label>
         <input type="range" min="0" max="360" value={angle} onChange={e => setAngle(Number(e.target.value))} className="form-range" />
       </div>
-      <div className="h-8 w-full rounded mb-2" style={{ background: `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)` }} />
+      <div className="h-8 w-full rounded mb-2" style={{ background: `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`, backgroundImage: `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)` }} />
     </div>
   );
 };
