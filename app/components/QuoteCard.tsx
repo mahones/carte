@@ -133,13 +133,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`
         }}
       >
-        {/* Guillemets décoratifs */}
-        <div 
-          className="absolute left-6 top-6 text-5xl text-white/80 select-none" 
-          style={{ 
-            fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif` 
-          }}
-        >"</div>
+        
         <div
           className="flex-1 flex flex-col justify-center w-full"
         >
@@ -199,13 +193,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
             >{subtitle}</span>
           </div>
         </div>
-        {/* Guillemets décoratifs bas */}
-        <div 
-          className="absolute right-6 bottom-6 text-5xl text-white/80 select-none" 
-          style={{ 
-            fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif` 
-          }}
-        >"</div>
+        
       </div>
       {/* Bouton de téléchargement */}
       <button
