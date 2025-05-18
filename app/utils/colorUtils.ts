@@ -1,47 +1,60 @@
-// Vérifie si une couleur ou un dégradé CSS est supporté par html2canvas
-export function isColorSupportedByHtml2Canvas(css: string): boolean {
-  // Si c'est une URL d'image, on accepte
-  if (css.startsWith('url(')) return true;
-
-  // Vérification des couleurs non supportées
-  if (/(oklab|lab|lch|color-mix|color-contrast|color-mix)/i.test(css)) {
-    return false;
+// Fonction pour vérifier si une couleur est dans un format supporté
+export const isColorSupportedByHtml2Canvas = (color: string): boolean => {
+  // Ajout : support des images de fond
+  if (/^url\(.+\)$/.test(color)) return true;
+  
+  // Vérifie si c'est une couleur hex
+  if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color)) return true;
+  
+  // Vérifie si c'est une couleur rgb/rgba
+  if (/^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/.test(color)) return true;
+  
+  // Vérifie si c'est une couleur hsl/hsla
+  if (/^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[\d.]+\s*)?\)$/.test(color)) return true;
+  
+  // Vérifie si c'est un dégradé linéaire classique
+  if (/^linear-gradient\(\s*\d+deg\s*,\s*[^)]+\)$/.test(color)) {
+    // Vérifie que les couleurs dans le dégradé sont supportées
+    const colors = color.match(/(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\([^)]+\)|hsla?\([^)]+\))/g);
+    if (!colors) return false;
+    return colors.every(c => isColorSupportedByHtml2Canvas(c));
   }
+  
+  return false;
+};
 
-  // Validation des formats de couleur supportés
-  const validFormats = {
-    hex: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i,
-    rgb: /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/i,
-    rgba: /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)$/i,
-    hsl: /^hsl\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*\)$/i,
-    hsla: /^hsla\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*,\s*(0|1|0?\.\d+)\s*\)$/i,
-    linearGradient: /^linear-gradient\(\s*\d+deg\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*\)$/i
-  };
-
-  // Vérifie si la couleur correspond à l'un des formats supportés
-  return Object.values(validFormats).some(format => format.test(css));
-}
-
-// Convertit une couleur non supportée en une couleur supportée
-export function convertToSupportedColor(color: string): string {
-  // Si la couleur est déjà supportée, la retourne telle quelle
-  if (isColorSupportedByHtml2Canvas(color)) {
-    return color;
+// Fonction pour convertir une couleur en format supporté
+export const convertToSupportedColor = (color: string): string => {
+  // Si la couleur est déjà dans un format supporté, la retourner telle quelle
+  if (isColorSupportedByHtml2Canvas(color)) return color;
+  
+  // Si c'est un dégradé, convertir les couleurs à l'intérieur
+  if (color.includes('linear-gradient')) {
+    return color.replace(/(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\([^)]+\)|hsla?\([^)]+\))/g, (match) => {
+      return convertToSupportedColor(match);
+    });
   }
+  
+  // Par défaut, retourner une couleur hex blanche
+  return '#ffffff';
+};
 
-  // Si c'est une URL d'image, la retourne telle quelle
-  if (color.startsWith('url(')) {
-    return color;
-  }
-
-  // Par défaut, retourne une couleur de secours
-  return '#1e3a8a';
-}
-
-// Vérifie si un dégradé est valide
-export function isValidGradient(gradient: string): boolean {
-  return /^linear-gradient\(\s*\d+deg\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*,\s*(#[0-9a-f]{3}|#[0-9a-f]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\))\s*\)$/i.test(gradient);
-}
+// Fonction pour valider un dégradé
+export const isValidGradient = (gradient: string): boolean => {
+  if (!gradient.startsWith('linear-gradient')) return false;
+  
+  // Vérifie que l'angle est valide
+  const angleMatch = gradient.match(/linear-gradient\((\d+)deg/);
+  if (!angleMatch) return false;
+  const angle = parseInt(angleMatch[1]);
+  if (isNaN(angle) || angle < 0 || angle > 360) return false;
+  
+  // Vérifie que les couleurs sont valides
+  const colors = gradient.match(/(#[A-Fa-f0-9]{6}|#[A-Fa-f0-9]{3}|rgba?\([^)]+\)|hsla?\([^)]+\))/g);
+  if (!colors || colors.length < 2) return false;
+  
+  return colors.every(color => isColorSupportedByHtml2Canvas(color));
+};
 
 // Prépare le style de fond pour le téléchargement
 export function prepareBackgroundForDownload(element: HTMLElement): void {

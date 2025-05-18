@@ -13,25 +13,25 @@ export default function QuoteCardGenerator() {
   const [author, setAuthor] = useState("Nelson Mandela");
   const [subtitle, setSubtitle] = useState("World-renowned Peace Icon");
   const [profileImg, setProfileImg] = useState<string | null>(null);
-  const [bgType, setBgType] = useState("gradient"); // 'solid', 'gradient', 'image'
+  const [bgType, setBgType] = useState<"solid" | "gradient" | "image">("solid");
   const [bgColor, setBgColor] = useState("#1e3a8a");
-  const [bgGradient, setBgGradient] = useState("linear-gradient(135deg, #1e3a8a 0%, #06b6d4 100%)");
+  const [bgGradient, setBgGradient] = useState("");
   const [bgImage, setBgImage] = useState<string | null>(null);
-  const [fontFamily, setFontFamily] = useState("Roboto, sans-serif");
-  const [fontColor, setFontColor] = useState("#fff");
+  const [fontFamily, setFontFamily] = useState("Roboto");
+  const [fontColor, setFontColor] = useState("#ffffff");
   const [fontWeight, setFontWeight] = useState("bold");
-  const [align, setAlign] = useState("center");
+  const [align, setAlign] = useState<"left" | "center" | "right">("center");
   const [showAuthor, setShowAuthor] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
   const [gradientError, setGradientError] = useState("");
-  const [authorColor, setAuthorColor] = useState("#fff");
-  const [subtitleColor, setSubtitleColor] = useState("#e0e0e0");
+  const [authorColor, setAuthorColor] = useState("#ffffff");
+  const [subtitleColor, setSubtitleColor] = useState("#ffffff");
   const [fontSize, setFontSize] = useState("24");
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [lineHeight, setLineHeight] = useState("1.5");
   const [letterSpacing, setLetterSpacing] = useState("0");
-  const [authorAlign, setAuthorAlign] = useState("left");
+  const [authorAlign, setAuthorAlign] = useState<"left" | "center" | "right">("left");
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
@@ -42,7 +42,7 @@ export default function QuoteCardGenerator() {
   const [openCitation, setOpenCitation] = useState(true);
   const [openAuteur, setOpenAuteur] = useState(false);
   const [openFond, setOpenFond] = useState(false);
-  const [downloadError, setDownloadError] = useState("");
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // Gestion de l'upload d'image de profil
   const handleProfileImg = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +90,7 @@ export default function QuoteCardGenerator() {
     } else if (currentBgType === "gradient") {
       bgToTest = currentBgGradient;
     } else if (currentBgType === "image" && currentBgImage) {
-      bgToTest = currentBgImage;
+      bgToTest = `url(${currentBgImage})`;
     }
 
     if (!isColorSupportedByHtml2Canvas(bgToTest)) {
@@ -124,37 +124,28 @@ export default function QuoteCardGenerator() {
   };
 
   // Style dynamique du fond de la carte
-  let cardBg = {};
-  if (bgType === "solid") {
-    cardBg = { background: bgColor || "#fff" };
-  } else if (bgType === "gradient") {
-    cardBg = { background: bgGradient };
-  } else if (bgType === "image" && bgImage) {
-    cardBg = { background: `url(${bgImage}) center/cover` };
-  } else {
-    cardBg = { background: "#fff" };
-  }
+  let cardBg: React.CSSProperties = {
+    backgroundColor: bgType === "solid" ? bgColor : "#fff",
+    backgroundImage: bgType === "gradient" ? bgGradient : bgType === "image" && bgImage ? `url(${bgImage})` : "none",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  };
 
   // Gestion du drag and drop pour l'image de profil
   const handleDragStart = (e: React.DragEvent<HTMLImageElement>) => {
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - imagePosition.x,
-      y: e.clientY - imagePosition.y
-    });
+    e.dataTransfer.setData("text/plain", "");
   };
 
   const handleDrag = (e: React.DragEvent<HTMLImageElement>) => {
-    if (isDragging) {
-      setImagePosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
-    }
+    if (e.clientX === 0 && e.clientY === 0) return;
+    setImagePosition({
+      x: e.clientX - e.currentTarget.getBoundingClientRect().left,
+      y: e.clientY - e.currentTarget.getBoundingClientRect().top,
+    });
   };
 
   const handleDragEnd = () => {
-    setIsDragging(false);
+    // Optionnel : ajouter une logique de fin de drag si nécessaire
   };
 
   return (
@@ -164,6 +155,20 @@ export default function QuoteCardGenerator() {
         <SidebarMenu
           quote={quote}
           setQuote={setQuote}
+          author={author}
+          setAuthor={setAuthor}
+          subtitle={subtitle}
+          setSubtitle={setSubtitle}
+          profileImg={profileImg}
+          handleProfileImg={handleProfileImg}
+          bgType={bgType}
+          setBgType={(type: "solid" | "gradient" | "image") => setBgType(type)}
+          bgColor={bgColor}
+          setBgColor={setBgColor}
+          bgGradient={bgGradient}
+          setBgGradient={setBgGradient}
+          bgImage={bgImage}
+          setBgImage={setBgImage}
           fontFamily={fontFamily}
           setFontFamily={setFontFamily}
           fontColor={fontColor}
@@ -171,7 +176,7 @@ export default function QuoteCardGenerator() {
           fontWeight={fontWeight}
           setFontWeight={setFontWeight}
           align={align}
-          setAlign={setAlign}
+          setAlign={(value: "left" | "center" | "right") => setAlign(value)}
           fontSize={fontSize}
           setFontSize={setFontSize}
           isItalic={isItalic}
@@ -182,36 +187,20 @@ export default function QuoteCardGenerator() {
           setLineHeight={setLineHeight}
           letterSpacing={letterSpacing}
           setLetterSpacing={setLetterSpacing}
-          author={author}
-          setAuthor={setAuthor}
           authorColor={authorColor}
           setAuthorColor={setAuthorColor}
-          subtitle={subtitle}
-          setSubtitle={setSubtitle}
           subtitleColor={subtitleColor}
           setSubtitleColor={setSubtitleColor}
-          profileImg={profileImg}
-          handleProfileImg={handleProfileImg}
           authorAlign={authorAlign}
-          setAuthorAlign={setAuthorAlign}
-          bgType={bgType}
-          setBgType={setBgType}
-          bgColor={bgColor}
-          setBgColor={setBgColor}
-          bgGradient={bgGradient}
-          setBgGradient={setBgGradient}
+          setAuthorAlign={(value: "left" | "center" | "right") => setAuthorAlign(value)}
           gradientColor1={gradientColor1}
           setGradientColor1={setGradientColor1}
           gradientColor2={gradientColor2}
           setGradientColor2={setGradientColor2}
           gradientAngle={gradientAngle}
           setGradientAngle={setGradientAngle}
-          bgImage={bgImage}
-          setBgImage={setBgImage}
           handleBgImg={handleBgImg}
         />
-
-        {/* Aperçu de la carte de citation sticky */}
         <QuoteCard
           quote={quote}
           author={author}
@@ -235,8 +224,8 @@ export default function QuoteCardGenerator() {
           handleDrag={handleDrag}
           handleDragEnd={handleDragEnd}
           cardRef={cardRef}
-          handleDownload={handleDownload}
           downloadError={downloadError}
+          handleDownload={handleDownload}
         />
       </div>
     </div>

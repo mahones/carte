@@ -13,8 +13,8 @@ interface SidebarMenuProps {
   setFontColor: (v: string) => void;
   fontWeight: string;
   setFontWeight: (v: string) => void;
-  align: string;
-  setAlign: (v: string) => void;
+  align: "left" | "center" | "right";
+  setAlign: (v: "left" | "center" | "right") => void;
   fontSize: string;
   setFontSize: (v: string) => void;
   isItalic: boolean;
@@ -36,11 +36,11 @@ interface SidebarMenuProps {
   setSubtitleColor: (v: string) => void;
   profileImg: string | null;
   handleProfileImg: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  authorAlign: string;
-  setAuthorAlign: (v: string) => void;
+  authorAlign: "left" | "center" | "right";
+  setAuthorAlign: (v: "left" | "center" | "right") => void;
   // Fond
-  bgType: string;
-  setBgType: (v: string) => void;
+  bgType: "solid" | "gradient" | "image";
+  setBgType: (v: "solid" | "gradient" | "image") => void;
   bgColor: string;
   setBgColor: (v: string) => void;
   bgGradient: string;
@@ -114,7 +114,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
                 {/* Alignement */}
                 <div className="mb-2">
                   <label className="form-label">Alignement</label>
-                  <select value={props.align} onChange={e => props.setAlign(e.target.value)} className="form-select">
+                  <select value={props.align} onChange={e => props.setAlign(e.target.value as "left" | "center" | "right")} className="form-select">
                     <option value="left">Gauche</option>
                     <option value="center">Centre</option>
                     <option value="right">Droite</option>
@@ -169,7 +169,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
                 <UploadImage label="IMAGE" image={props.profileImg} onChange={props.handleProfileImg} shape="circle" inputId="profile-upload" />
               </div>
               <label className="form-label">Alignement du bloc auteur</label>
-              <select value={props.authorAlign} onChange={e => props.setAuthorAlign(e.target.value)} className="form-select">
+              <select value={props.authorAlign} onChange={e => props.setAuthorAlign(e.target.value as "left" | "center" | "right")} className="form-select">
                 <option value="left">Gauche</option>
                 <option value="center">Centre</option>
                 <option value="right">Droite</option>
@@ -186,22 +186,24 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
           {openFond && (
             <div className="px-6 pb-4">
               <div className="btn-group mb-2" role="group">
-                <button type="button" className={`btn btn-outline-primary ${props.bgType === "solid" ? "active" : ""}`} onClick={() => {
-                  const currentColor = props.bgColor;
-                  props.setBgType("solid");
-                  props.setBgColor(currentColor);
-                  props.setBgGradient("");
-                  props.setBgImage(null);
-                }}>Uni</button>
-                <button type="button" className={`btn btn-outline-primary ${props.bgType === "gradient" ? "active" : ""}`} onClick={() => {
-                  props.setBgType("gradient");
-                  props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${props.gradientColor1} 0%, ${props.gradientColor2} 100%)`);
-                  props.setBgImage(null);
-                }}>Dégradé</button>
-                <button type="button" className={`btn btn-outline-primary ${props.bgType === "image" ? "active" : ""}`} onClick={() => {
-                  props.setBgType("image");
-                  props.setBgGradient("");
-                }}>Image</button>
+                <button
+                  onClick={() => props.setBgType("solid")}
+                  className={`btn ${props.bgType === "solid" ? "btn-primary" : "btn-outline-primary"} w-100 mb-2`}
+                >
+                  Uni
+                </button>
+                <button
+                  onClick={() => props.setBgType("gradient")}
+                  className={`btn ${props.bgType === "gradient" ? "btn-primary" : "btn-outline-primary"} w-100 mb-2`}
+                >
+                  D&apos;égradé
+                </button>
+                <button
+                  onClick={() => props.setBgType("image")}
+                  className={`btn ${props.bgType === "image" ? "btn-primary" : "btn-outline-primary"} w-100 mb-2`}
+                >
+                  Image
+                </button>
               </div>
               {props.bgType === "solid" && (
                 <div className="mb-2">

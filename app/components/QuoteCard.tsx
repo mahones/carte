@@ -1,5 +1,6 @@
 import React from "react";
 import html2canvas from 'html2canvas';
+import { isColorSupportedByHtml2Canvas, convertToSupportedColor, prepareBackgroundForDownload } from "../utils/colorUtils";
 
 interface QuoteCardProps {
   quote: string;
@@ -10,7 +11,7 @@ interface QuoteCardProps {
   fontFamily: string;
   fontColor: string;
   fontWeight: string;
-  align: string;
+  align: "left" | "center" | "right";
   fontSize: string;
   isItalic: boolean;
   isUnderline: boolean;
@@ -18,13 +19,14 @@ interface QuoteCardProps {
   letterSpacing: string;
   authorColor: string;
   subtitleColor: string;
-  authorAlign: string;
+  authorAlign: "left" | "center" | "right";
   imagePosition: { x: number; y: number };
   handleDragStart: (e: React.DragEvent<HTMLImageElement>) => void;
   handleDrag: (e: React.DragEvent<HTMLImageElement>) => void;
   handleDragEnd: () => void;
   cardRef: React.RefObject<HTMLDivElement | null>;
   downloadError: string | null;
+  handleDownload: () => void;
 }
 
 const QuoteCard: React.FC<QuoteCardProps> = ({
@@ -50,18 +52,27 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
   handleDrag,
   handleDragEnd,
   cardRef,
-  downloadError
+  downloadError,
+  handleDownload
 }) => {
   const processAndDownload = async () => {
     if (!cardRef.current) return;
 
     try {
-      // Vérifier et convertir les couleurs non supportées
       const cardElement = cardRef.current;
       
-      // Sauvegarder le style actuel
-      const originalBackground = cardElement.style.background;
-      const originalBackgroundColor = cardElement.style.backgroundColor;
+      // Sauvegarder les styles originaux
+      const originalStyles = {
+        background: cardElement.style.background,
+        backgroundColor: cardElement.style.backgroundColor,
+        backgroundImage: cardElement.style.backgroundImage,
+        backgroundSize: cardElement.style.backgroundSize,
+        backgroundPosition: cardElement.style.backgroundPosition,
+        backgroundRepeat: cardElement.style.backgroundRepeat
+      };
+
+      // Préparer le fond pour le téléchargement
+      prepareBackgroundForDownload(cardElement);
       
       // S'assurer que les polices sont chargées avant la capture
       await document.fonts.ready;
@@ -71,17 +82,15 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: originalBackgroundColor || null,
+        backgroundColor: null,
         logging: false,
         removeContainer: true,
         foreignObjectRendering: false,
         onclone: (clonedDoc) => {
-          // Appliquer les styles au clone pour s'assurer qu'ils sont bien pris en compte
           const clonedElement = clonedDoc.querySelector('[data-card]');
           if (clonedElement) {
-            // Appliquer le style de fond original au clone
-            (clonedElement as HTMLElement).style.background = originalBackground;
-            (clonedElement as HTMLElement).style.backgroundColor = originalBackgroundColor;
+            // Préparer le fond du clone
+            prepareBackgroundForDownload(clonedElement as HTMLElement);
             
             // Forcer le chargement des polices et appliquer les styles dans le clone
             const textElements = clonedElement.querySelectorAll('*');
@@ -102,6 +111,9 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
         }
       });
 
+      // Restaurer les styles originaux
+      Object.assign(cardElement.style, originalStyles);
+
       // Créer le lien de téléchargement
       const link = document.createElement("a");
       link.download = "quote-card.png";
@@ -120,7 +132,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
         className="sticky top-8 relative w-[540px] h-[540px] rounded-2xl shadow-2xl flex flex-col justify-center items-center p-8"
         style={{
           ...cardBg,
-          fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`
+          fontFamily: fontFamily
         }}
       >
         <div
@@ -129,7 +141,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           <span
             className="quote-text"
             style={{
-              fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`,
+              fontFamily: fontFamily,
               color: fontColor,
               fontWeight,
               textAlign: align as 'left' | 'center' | 'right',
@@ -146,7 +158,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           className="flex items-center gap-3 mt-6 w-full"
           style={{ 
             justifyContent: authorAlign === 'left' ? 'flex-start' : authorAlign === 'center' ? 'center' : 'flex-end',
-            fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`
+            fontFamily: fontFamily
           }}
         >
           {profileImg && (
@@ -169,14 +181,14 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
             <span 
               className="font-semibold" 
               style={{ 
-                fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`, 
+                fontFamily: fontFamily, 
                 color: authorColor 
               }}
             >{author}</span>
             <span 
               className="text-xs opacity-80" 
               style={{ 
-                fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`, 
+                fontFamily: fontFamily, 
                 color: subtitleColor 
               }}
             >{subtitle}</span>
@@ -185,7 +197,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
       </div>
       {/* Bouton de téléchargement */}
       <button
-        onClick={processAndDownload}
+        onClick={handleDownload}
         className="btn btn-primary btn-lg mt-5 mb-3 px-8 py-3 bg-primary text-white rounded-[15px] shadow-sm fw-bold fs-5 transition-all duration-200 hover:bg-blue-700 hover:scale-105 hover:shadow-lg"
       >
         Télécharger l&apos;image

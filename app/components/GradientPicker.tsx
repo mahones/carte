@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { isValidGradient } from "../utils/colorUtils";
 
 interface GradientPickerProps {
@@ -12,12 +12,12 @@ interface GradientPickerProps {
 }
 
 const GradientPicker: React.FC<GradientPickerProps> = ({ color1, setColor1, color2, setColor2, angle, setAngle, onGradientChange }) => {
-  const updateGradient = (newColor1: string, newColor2: string, newAngle: number) => {
+  const updateGradient = useCallback((newColor1: string, newColor2: string, newAngle: number) => {
     const gradient = `linear-gradient(${newAngle}deg, ${newColor1} 0%, ${newColor2} 100%)`;
     if (isValidGradient(gradient)) {
       onGradientChange(gradient);
     }
-  };
+  }, [onGradientChange]);
 
   const handleColor1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
