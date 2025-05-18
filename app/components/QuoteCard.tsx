@@ -1,5 +1,4 @@
 import React from "react";
-import { isColorSupportedByHtml2Canvas, convertToSupportedColor, prepareBackgroundForDownload } from '../utils/colorUtils';
 import html2canvas from 'html2canvas';
 
 interface QuoteCardProps {
@@ -25,7 +24,6 @@ interface QuoteCardProps {
   handleDrag: (e: React.DragEvent<HTMLImageElement>) => void;
   handleDragEnd: () => void;
   cardRef: React.RefObject<HTMLDivElement | null>;
-  handleDownload: () => void;
   downloadError: string | null;
 }
 
@@ -52,7 +50,6 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
   handleDrag,
   handleDragEnd,
   cardRef,
-  handleDownload,
   downloadError
 }) => {
   const processAndDownload = async () => {
@@ -126,7 +123,6 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`
         }}
       >
-        
         <div
           className="flex-1 flex flex-col justify-center w-full"
         >
@@ -136,7 +132,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
               fontFamily: `var(--font-${fontFamily.toLowerCase().split(',')[0].trim()}), sans-serif`,
               color: fontColor,
               fontWeight,
-              textAlign: align as any,
+              textAlign: align as 'left' | 'center' | 'right',
               fontSize: `${fontSize}px`,
               fontStyle: isItalic ? 'italic' : 'normal',
               textDecoration: isUnderline ? 'underline' : 'none',
@@ -186,14 +182,13 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
             >{subtitle}</span>
           </div>
         </div>
-
       </div>
       {/* Bouton de téléchargement */}
       <button
         onClick={processAndDownload}
         className="btn btn-primary btn-lg mt-5 mb-3 px-8 py-3 bg-primary text-white rounded-[15px] shadow-sm fw-bold fs-5 transition-all duration-200 hover:bg-blue-700 hover:scale-105 hover:shadow-lg"
       >
-        Télécharger l'image
+        Télécharger l&apos;image
       </button>
       {downloadError && (
         <div className="text-danger text-center mt-2">{downloadError}</div>

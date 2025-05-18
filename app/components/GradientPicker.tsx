@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { isValidGradient } from "../utils/colorUtils";
 
 interface GradientPickerProps {
@@ -37,10 +37,9 @@ const GradientPicker: React.FC<GradientPickerProps> = ({ color1, setColor1, colo
     updateGradient(color1, color2, newAngle);
   };
 
-  // Mettre à jour le dégradé initial
-  React.useEffect(() => {
+  useEffect(() => {
     updateGradient(color1, color2, angle);
-  }, []);
+  }, [angle, color1, color2, updateGradient]);
 
   return (
     <div>
