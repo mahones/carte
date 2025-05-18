@@ -9,9 +9,9 @@ import { isColorSupportedByHtml2Canvas } from "./utils/colorUtils";
 // Composant principal du générateur de carte de citation
 export default function QuoteCardGenerator() {
   // États pour les champs de la carte
-  const [quote, setQuote] = useState("Education is the most powerful weapon which you can use to change the world.");
-  const [author, setAuthor] = useState("Nelson Mandela");
-  const [subtitle, setSubtitle] = useState("World-renowned Peace Icon");
+  const [quote, setQuote] = useState("En tant que développeur web spécialisé dans WordPress, je crée des sites web sur mesure et des solutions en ligne adaptées aux besoins spécifiques de mes clients.");
+  const [author, setAuthor] = useState("Mahones SITTI");
+  const [subtitle, setSubtitle] = useState("Développeur web");
   const [profileImg, setProfileImg] = useState<string | null>(null);
   const [bgType, setBgType] = useState<"solid" | "gradient" | "image">("solid");
   const [bgColor, setBgColor] = useState("#1e3a8a");
