@@ -187,16 +187,24 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
             <div className="px-6 pb-4">
               <div className="btn-group mb-2" role="group">
                 <button type="button" className={`btn btn-outline-primary ${props.bgType === "solid" ? "active" : ""}`} onClick={() => {
-                  props.setBgType("solid");
-                  props.setBgGradient("");
-                  props.setBgImage(null);
+                  if (props.bgType !== "solid") {
+                    props.setBgType("solid");
+                    props.setBgGradient("");
+                    props.setBgImage(null);
+                  }
                 }}>Uni</button>
                 <button type="button" className={`btn btn-outline-primary ${props.bgType === "gradient" ? "active" : ""}`} onClick={() => {
-                  props.setBgType("gradient");
-                  props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${props.gradientColor1} 0%, ${props.gradientColor2} 100%)`);
-                  props.setBgImage(null);
+                  if (props.bgType !== "gradient") {
+                    props.setBgType("gradient");
+                    props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${props.gradientColor1} 0%, ${props.gradientColor2} 100%)`);
+                    props.setBgImage(null);
+                  }
                 }}>Dégradé</button>
-                <button type="button" className={`btn btn-outline-primary ${props.bgType === "image" ? "active" : ""}`} onClick={() => props.setBgType("image")}>Image</button>
+                <button type="button" className={`btn btn-outline-primary ${props.bgType === "image" ? "active" : ""}`} onClick={() => {
+                  if (props.bgType !== "image") {
+                    props.setBgType("image");
+                  }
+                }}>Image</button>
               </div>
               {props.bgType === "solid" && (
                 <div className="mb-2">

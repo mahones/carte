@@ -59,12 +59,8 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
     if (!cardRef.current) return;
 
     try {
-      // Vérifier et convertir les couleurs non supportées
       const cardElement = cardRef.current;
       
-      // Préparer le fond (image ou dégradé)
-      prepareBackgroundForDownload(cardElement);
-
       // S'assurer que les polices sont chargées avant la capture
       await document.fonts.ready;
 
@@ -78,11 +74,26 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
         removeContainer: true,
         foreignObjectRendering: false,
         onclone: (clonedDoc) => {
-          // Appliquer les styles au clone pour s'assurer qu'ils sont bien pris en compte
           const clonedElement = clonedDoc.querySelector('[data-card]');
           if (clonedElement) {
-            prepareBackgroundForDownload(clonedElement as HTMLElement);
-            
+            // Copier tous les styles de l'élément original
+            const computedStyle = window.getComputedStyle(cardElement);
+            const styles = {
+              background: computedStyle.background,
+              backgroundColor: computedStyle.backgroundColor,
+              backgroundImage: computedStyle.backgroundImage,
+              backgroundSize: computedStyle.backgroundSize,
+              backgroundPosition: computedStyle.backgroundPosition,
+              backgroundRepeat: computedStyle.backgroundRepeat
+            };
+
+            // Appliquer les styles au clone
+            Object.entries(styles).forEach(([property, value]) => {
+              if (value && value !== 'none') {
+                (clonedElement as HTMLElement).style[property as any] = value;
+              }
+            });
+
             // Forcer le chargement des polices et appliquer les styles dans le clone
             const textElements = clonedElement.querySelectorAll('*');
             textElements.forEach(element => {

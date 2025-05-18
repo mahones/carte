@@ -76,35 +76,57 @@ export default function QuoteCardGenerator() {
   // Fonction pour télécharger la carte en image
   const handleDownload = async () => {
     if (!cardRef.current) return;
+    
+    // Sauvegarder l'état actuel
+    const currentBgType = bgType;
+    const currentBgColor = bgColor;
+    const currentBgGradient = bgGradient;
+    const currentBgImage = bgImage;
+
     // Vérification des couleurs CSS supportées
     let bgToTest = "";
-    if (bgType === "solid") {
-      bgToTest = bgColor;
-    } else if (bgType === "gradient") {
-      bgToTest = bgGradient;
-    } else if (bgType === "image" && bgImage) {
-      bgToTest = bgImage;
+    if (currentBgType === "solid") {
+      bgToTest = currentBgColor;
+    } else if (currentBgType === "gradient") {
+      bgToTest = currentBgGradient;
+    } else if (currentBgType === "image" && currentBgImage) {
+      bgToTest = currentBgImage;
     }
+
     if (!isColorSupportedByHtml2Canvas(bgToTest)) {
       setDownloadError("Erreur : Le téléchargement ne supporte pas ce format de couleur ou de dégradé. Utilisez uniquement des couleurs hex, rgb, rgba, hsl ou un linear-gradient classique.");
       return;
     } else {
       setDownloadError("");
     }
-    // Import dynamique pour éviter les erreurs SSR
-    const html2canvas = (await import("html2canvas")).default;
-    html2canvas(cardRef.current).then((canvas) => {
+
+    try {
+      // Import dynamique pour éviter les erreurs SSR
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false,
+        removeContainer: true,
+        foreignObjectRendering: false
+      });
+
       const link = document.createElement("a");
       link.download = "quote-card.png";
       link.href = canvas.toDataURL();
       link.click();
-    });
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
+      setDownloadError("Une erreur est survenue lors du téléchargement.");
+    }
   };
 
   // Style dynamique du fond de la carte
   let cardBg = {};
   if (bgType === "solid") {
-    cardBg = { background: bgColor };
+    cardBg = { background: bgColor || "#fff" };
   } else if (bgType === "gradient") {
     cardBg = { background: bgGradient };
   } else if (bgType === "image" && bgImage) {
