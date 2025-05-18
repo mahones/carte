@@ -66,9 +66,6 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
       const originalBackground = cardElement.style.background;
       const originalBackgroundColor = cardElement.style.backgroundColor;
       
-      // Préparer le fond (image ou dégradé)
-      prepareBackgroundForDownload(cardElement);
-
       // S'assurer que les polices sont chargées avant la capture
       await document.fonts.ready;
 
@@ -107,10 +104,6 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           }
         }
       });
-
-      // Restaurer le style original
-      cardElement.style.background = originalBackground;
-      cardElement.style.backgroundColor = originalBackgroundColor;
 
       // Créer le lien de téléchargement
       const link = document.createElement("a");
@@ -193,7 +186,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
             >{subtitle}</span>
           </div>
         </div>
-        
+
       </div>
       {/* Bouton de téléchargement */}
       <button
