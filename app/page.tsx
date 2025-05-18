@@ -76,7 +76,7 @@ export default function QuoteCardGenerator() {
   // Fonction pour télécharger la carte en image
   const handleDownload = async () => {
     if (!cardRef.current) return;
-    
+
     // Sauvegarder l'état actuel
     const currentBgType = bgType;
     const currentBgColor = bgColor;

@@ -187,31 +187,28 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
             <div className="px-6 pb-4">
               <div className="btn-group mb-2" role="group">
                 <button type="button" className={`btn btn-outline-primary ${props.bgType === "solid" ? "active" : ""}`} onClick={() => {
-                  if (props.bgType !== "solid") {
-                    props.setBgType("solid");
-                    props.setBgGradient("");
-                    props.setBgImage(null);
-                  }
+                  const currentColor = props.bgColor;
+                  props.setBgType("solid");
+                  props.setBgColor(currentColor);
+                  props.setBgGradient("");
+                  props.setBgImage(null);
                 }}>Uni</button>
                 <button type="button" className={`btn btn-outline-primary ${props.bgType === "gradient" ? "active" : ""}`} onClick={() => {
-                  if (props.bgType !== "gradient") {
-                    props.setBgType("gradient");
-                    props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${props.gradientColor1} 0%, ${props.gradientColor2} 100%)`);
-                    props.setBgImage(null);
-                  }
+                  props.setBgType("gradient");
+                  props.setBgGradient(`linear-gradient(${props.gradientAngle}deg, ${props.gradientColor1} 0%, ${props.gradientColor2} 100%)`);
+                  props.setBgImage(null);
                 }}>Dégradé</button>
                 <button type="button" className={`btn btn-outline-primary ${props.bgType === "image" ? "active" : ""}`} onClick={() => {
-                  if (props.bgType !== "image") {
-                    props.setBgType("image");
-                  }
+                  props.setBgType("image");
+                  props.setBgGradient("");
                 }}>Image</button>
               </div>
               {props.bgType === "solid" && (
                 <div className="mb-2">
                   <label className="form-label">Couleur unique</label>
                   <input type="color" value={props.bgColor} onChange={e => {
-                    props.setBgType("solid");
-                    props.setBgColor(e.target.value);
+                    const newColor = e.target.value;
+                    props.setBgColor(newColor);
                     props.setBgGradient("");
                     props.setBgImage(null);
                   }} className="form-control form-control-color w-25" />

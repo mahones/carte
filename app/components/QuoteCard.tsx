@@ -59,8 +59,16 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
     if (!cardRef.current) return;
 
     try {
+      // Vérifier et convertir les couleurs non supportées
       const cardElement = cardRef.current;
       
+      // Sauvegarder le style actuel
+      const originalBackground = cardElement.style.background;
+      const originalBackgroundColor = cardElement.style.backgroundColor;
+      
+      // Préparer le fond (image ou dégradé)
+      prepareBackgroundForDownload(cardElement);
+
       // S'assurer que les polices sont chargées avant la capture
       await document.fonts.ready;
 
@@ -69,31 +77,18 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null,
+        backgroundColor: originalBackgroundColor || null,
         logging: false,
         removeContainer: true,
         foreignObjectRendering: false,
         onclone: (clonedDoc) => {
+          // Appliquer les styles au clone pour s'assurer qu'ils sont bien pris en compte
           const clonedElement = clonedDoc.querySelector('[data-card]');
           if (clonedElement) {
-            // Copier tous les styles de l'élément original
-            const computedStyle = window.getComputedStyle(cardElement);
-            const styles = {
-              background: computedStyle.background,
-              backgroundColor: computedStyle.backgroundColor,
-              backgroundImage: computedStyle.backgroundImage,
-              backgroundSize: computedStyle.backgroundSize,
-              backgroundPosition: computedStyle.backgroundPosition,
-              backgroundRepeat: computedStyle.backgroundRepeat
-            };
-
-            // Appliquer les styles au clone
-            Object.entries(styles).forEach(([property, value]) => {
-              if (value && value !== 'none') {
-                (clonedElement as HTMLElement).style[property as any] = value;
-              }
-            });
-
+            // Appliquer le style de fond original au clone
+            (clonedElement as HTMLElement).style.background = originalBackground;
+            (clonedElement as HTMLElement).style.backgroundColor = originalBackgroundColor;
+            
             // Forcer le chargement des polices et appliquer les styles dans le clone
             const textElements = clonedElement.querySelectorAll('*');
             textElements.forEach(element => {
@@ -112,6 +107,10 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           }
         }
       });
+
+      // Restaurer le style original
+      cardElement.style.background = originalBackground;
+      cardElement.style.backgroundColor = originalBackgroundColor;
 
       // Créer le lien de téléchargement
       const link = document.createElement("a");
