@@ -153,13 +153,13 @@ const SidebarMenu: React.FC<SidebarMenuProps> = (props) => {
         {/* Accordéon Auteur */}
         <div>
           <button type="button" className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 focus:outline-none" onClick={() => setOpenAuteur(!openAuteur)}>
-            <span className="font-bold">Nom de l'auteur</span>
+            <span className="font-bold">Nom de l&apos;auteur</span>
             {openAuteur ? <FaChevronUp /> : <FaChevronDown />}
           </button>
           {openAuteur && (
             <div className="px-6 pb-4">
               <input value={props.author} onChange={e => props.setAuthor(e.target.value)} className="form-control mt-2" />
-              <label className="form-label">Couleur du texte de l'auteur</label>
+              <label className="form-label">Couleur du texte de l&apos;auteur</label>
               <input type="color" value={props.authorColor} onChange={e => props.setAuthorColor(e.target.value)} className="form-control form-control-color w-25" />
               <label className="form-label">Sous-titre</label>
               <input value={props.subtitle} onChange={e => props.setSubtitle(e.target.value)} className="form-control" />

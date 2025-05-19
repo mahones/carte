@@ -1,6 +1,5 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import SidebarMenu from "./components/SidebarMenu";
 import QuoteCard from "./components/QuoteCard";
 import { useImageHandling } from "./hooks/useImageHandling";
@@ -22,9 +21,7 @@ export default function QuoteCardGenerator() {
   const [fontColor, setFontColor] = useState("#ffffff");
   const [fontWeight, setFontWeight] = useState("bold");
   const [align, setAlign] = useState<Alignment>("center");
-  const [showAuthor, setShowAuthor] = useState(true);
   const cardRef = useRef<HTMLDivElement>(null);
-  const [gradientError, setGradientError] = useState("");
   const [authorColor, setAuthorColor] = useState("#ffffff");
   const [subtitleColor, setSubtitleColor] = useState("#ffffff");
   const [fontSize, setFontSize] = useState("24");
@@ -39,10 +36,6 @@ export default function QuoteCardGenerator() {
   const [gradientColor1, setGradientColor1] = useState("#1e3a8a");
   const [gradientColor2, setGradientColor2] = useState("#06b6d4");
   const [gradientAngle, setGradientAngle] = useState(135);
-  // Accordéon states
-  const [openCitation, setOpenCitation] = useState(true);
-  const [openAuteur, setOpenAuteur] = useState(false);
-  const [openFond, setOpenFond] = useState(false);
 
   // Utilisation des hooks personnalisés
   const {
