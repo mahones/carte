@@ -6,6 +6,7 @@ import QuoteCard from "./components/QuoteCard";
 import { useImageHandling } from "./hooks/useImageHandling";
 import { useCardStyle } from "./hooks/useCardStyle";
 import { Alignment, BackgroundType } from "./types";
+import ClientOnly from "./components/ClientOnly";
 
 // Composant principal du générateur de carte de citation
 export default function QuoteCardGenerator() {
@@ -141,32 +142,34 @@ export default function QuoteCardGenerator() {
           setGradientAngle={setGradientAngle}
           handleBgImg={handleBgImg}
         />
-        <QuoteCard
-          quote={quote}
-          author={author}
-          subtitle={subtitle}
-          profileImg={profileImg}
-          cardBg={cardBg}
-          fontFamily={fontFamily}
-          fontColor={fontColor}
-          fontWeight={fontWeight}
-          align={align}
-          fontSize={fontSize}
-          isItalic={isItalic}
-          isUnderline={isUnderline}
-          lineHeight={lineHeight}
-          letterSpacing={letterSpacing}
-          authorColor={authorColor}
-          subtitleColor={subtitleColor}
-          authorAlign={authorAlign}
-          imagePosition={imagePosition}
-          handleDragStart={handleDragStart}
-          handleDrag={handleDrag}
-          handleDragEnd={handleDragEnd}
-          cardRef={cardRef}
-          downloadError={downloadError}
-          handleDownload={handleDownload}
-        />
+        <ClientOnly>
+          <QuoteCard
+            quote={quote}
+            author={author}
+            subtitle={subtitle}
+            profileImg={profileImg}
+            cardBg={cardBg}
+            fontFamily={fontFamily}
+            fontColor={fontColor}
+            fontWeight={fontWeight}
+            align={align}
+            fontSize={fontSize}
+            isItalic={isItalic}
+            isUnderline={isUnderline}
+            lineHeight={lineHeight}
+            letterSpacing={letterSpacing}
+            authorColor={authorColor}
+            subtitleColor={subtitleColor}
+            authorAlign={authorAlign}
+            imagePosition={imagePosition}
+            handleDragStart={handleDragStart}
+            handleDrag={handleDrag}
+            handleDragEnd={handleDragEnd}
+            cardRef={cardRef}
+            downloadError={downloadError}
+            handleDownload={handleDownload}
+          />
+        </ClientOnly>
       </div>
     </div>
   );
