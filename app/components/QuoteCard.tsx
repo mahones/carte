@@ -1,6 +1,4 @@
 import React from "react";
-import html2canvas from 'html2canvas';
-import { prepareBackgroundForDownload } from "../utils/colorUtils";
 
 interface QuoteCardProps {
   quote: string;
