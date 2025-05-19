@@ -30,7 +30,6 @@ export default function QuoteCardGenerator() {
   const [lineHeight, setLineHeight] = useState("1.5");
   const [letterSpacing, setLetterSpacing] = useState("0");
   const [authorAlign, setAuthorAlign] = useState<Alignment>("left");
-  const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [gradientColor1, setGradientColor1] = useState("#1e3a8a");
@@ -63,7 +62,6 @@ export default function QuoteCardGenerator() {
   // Gestion du drag and drop pour l'image de profil
   const handleDragStart = (e: React.DragEvent<HTMLImageElement>) => {
     e.dataTransfer.setData("text/plain", "");
-    setIsDragging(true);
     setDragStart({
       x: e.clientX - e.currentTarget.getBoundingClientRect().left,
       y: e.clientY - e.currentTarget.getBoundingClientRect().top
@@ -79,7 +77,7 @@ export default function QuoteCardGenerator() {
   };
 
   const handleDragEnd = () => {
-    setIsDragging(false);
+    // No need to set isDragging to false here, as it's not used in the component
   };
 
   return (

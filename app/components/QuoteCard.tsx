@@ -1,6 +1,6 @@
 import React from "react";
 import html2canvas from 'html2canvas';
-import { isColorSupportedByHtml2Canvas, convertToSupportedColor, prepareBackgroundForDownload } from "../utils/colorUtils";
+import { prepareBackgroundForDownload } from "../utils/colorUtils";
 
 interface QuoteCardProps {
   quote: string;
@@ -55,84 +55,6 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
   downloadError,
   handleDownload
 }) => {
-  const processAndDownload = async () => {
-    if (!cardRef.current) return;
-
-    try {
-      const cardElement = cardRef.current;
-      
-      // Sauvegarder les styles originaux
-      const originalStyles = {
-        background: cardElement.style.background,
-        backgroundColor: cardElement.style.backgroundColor,
-        backgroundImage: cardElement.style.backgroundImage,
-        backgroundSize: cardElement.style.backgroundSize,
-        backgroundPosition: cardElement.style.backgroundPosition,
-        backgroundRepeat: cardElement.style.backgroundRepeat
-      };
-
-      // Préparer le fond pour le téléchargement
-      prepareBackgroundForDownload(cardElement);
-      
-      // S'assurer que les polices sont chargées avant la capture
-      await document.fonts.ready;
-
-      // Créer un clone de l'élément pour la capture
-      const clone = cardElement.cloneNode(true) as HTMLElement;
-      clone.style.position = 'absolute';
-      clone.style.left = '-9999px';
-      document.body.appendChild(clone);
-
-      // Générer l'image avec les options appropriées
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        logging: false,
-        removeContainer: true,
-        foreignObjectRendering: false,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('[data-card]');
-          if (clonedElement) {
-            // Préparer le fond du clone
-            prepareBackgroundForDownload(clonedElement as HTMLElement);
-            
-            // Forcer le chargement des polices et appliquer les styles dans le clone
-            const textElements = clonedElement.querySelectorAll('*');
-            textElements.forEach(element => {
-              const computedStyle = window.getComputedStyle(element);
-              const fontFamily = computedStyle.fontFamily;
-              if (fontFamily && fontFamily !== 'inherit') {
-                (element as HTMLElement).style.fontFamily = fontFamily;
-              }
-              
-              // Appliquer les styles de texte
-              if (element.classList.contains('quote-text')) {
-                (element as HTMLElement).style.fontStyle = isItalic ? 'italic' : 'normal';
-                (element as HTMLElement).style.textDecoration = isUnderline ? 'underline' : 'none';
-              }
-            });
-          }
-        }
-      });
-
-      // Nettoyer le clone
-      document.body.removeChild(clone);
-
-      // Restaurer les styles originaux
-      Object.assign(cardElement.style, originalStyles);
-
-      // Créer le lien de téléchargement
-      const link = document.createElement("a");
-      link.download = "quote-card.png";
-      link.href = canvas.toDataURL("image/png", 1.0);
-      link.click();
-    } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
-    }
-  };
-
   return (
     <div className="flex flex-col items-center flex-1">
       <div
