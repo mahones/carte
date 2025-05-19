@@ -77,8 +77,14 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
       // S'assurer que les polices sont chargées avant la capture
       await document.fonts.ready;
 
+      // Créer un clone de l'élément pour la capture
+      const clone = cardElement.cloneNode(true) as HTMLElement;
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      document.body.appendChild(clone);
+
       // Générer l'image avec les options appropriées
-      const canvas = await html2canvas(cardRef.current, {
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
@@ -110,6 +116,9 @@ const QuoteCard: React.FC<QuoteCardProps> = ({
           }
         }
       });
+
+      // Nettoyer le clone
+      document.body.removeChild(clone);
 
       // Restaurer les styles originaux
       Object.assign(cardElement.style, originalStyles);
